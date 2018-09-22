@@ -4,6 +4,10 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from tutorial.quickstart.serializers import UserSerializer, GroupSerializer
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -22,3 +26,19 @@ class GroupViewSet(viewsets.ModelViewSet):
 
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+
+
+class ExampleView(viewsets.ViewSet):
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    permission_classes = (IsAuthenticated,)
+    # base_name = "test"
+
+    # def get_default_base_name(self):
+    #     return base_name
+
+    def get(self, request, format=None):
+        content = {
+            "user": unicode(request.user),  # `django.contrib.auth.User` instance.
+            "auth": unicode(request.auth),  # None
+        }
+        return Response(content)
